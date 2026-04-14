@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glow & Relax | Booking Services</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">Glow & Relax</div>
+        <ul class="nav-links">
+            <li><a href="#services">Services</a></li>
+            <li><a href="login.html" class="login-btn">Login</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h1>Premium Wellness & Beauty</h1>
+        <p>Book your next transformation in just a few clicks.</p>
+    </header>
+
+    <section id="services" class="services-container">
+        <h2 class="section-title">Our Services</h2>
+        
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">💇‍♀️</div>
+                <h3>Hair Styling</h3>
+                <p>Cuts, coloring, and treatments tailored to your style.</p>
+                <button onclick="handleBooking('Hair')" class="book-btn">Book Now</button>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">💅</div>
+                <h3>Nail Art</h3>
+                <p>Manicures and pedicures with premium gel finishes.</p>
+                <button onclick="handleBooking('Nails')" class="book-btn">Book Now</button>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">🧖‍♀️</div>
+                <h3>Spa & Massage</h3>
+                <p>Deep tissue and relaxation massages for your well-being.</p>
+                <button onclick="handleBooking('Spa')" class="book-btn">Book Now</button>
+            </div>
+        </div>
+    </section>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>

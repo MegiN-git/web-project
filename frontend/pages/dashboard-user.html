@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard | Glow & Relax</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">Glow & Relax</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="dashboard-content">
+        <header class="dash-header">
+            <h1>Welcome, Beauty Enthusiast!</h1>
+            <p>Select a service below to view available times.</p>
+        </header>
+
+        <div class="services-grid">
+            <div class="service-card" onclick="openBooking('Hair Styling')">
+                <div class="service-icon">💇‍♀️</div>
+                <h3>Hair Styling</h3>
+                <button class="select-btn">Select Date</button>
+            </div>
+            <div class="service-card" onclick="openBooking('Nail Art')">
+                <div class="service-icon">💅</div>
+                <h3>Nail Art</h3>
+                <button class="select-btn">Select Date</button>
+            </div>
+            <div class="service-card" onclick="openBooking('Spa & Massage')">
+                <div class="service-icon">🧖‍♀️</div>
+                <h3>Spa & Massage</h3>
+                <button class="select-btn">Select Date</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeBooking()">&times;</span>
+            <h2 id="modalTitle">Book Service</h2>
+            <form id="reservationForm">
+                <div class="input-group">
+                    <label>Your Email (for confirmation)</label>
+                    <input type="email" id="userEmail" required>
+                </div>
+                
+                <div class="input-group">
+                    <label>Select Date</label>
+                    <input type="date" id="bookingDate" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Available Times</label>
+                    <select id="bookingTime" required>
+                        <option value="09:00">09:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="14:00">02:00 PM</option>
+                        <option value="16:00">04:00 PM</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-btn">Confirm Reservation</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>

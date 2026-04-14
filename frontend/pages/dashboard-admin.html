@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Glow & Relax</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo">Admin Panel</div>
+            <ul class="sidebar-links">
+                <li id="link-res" class="active"><a href="#" onclick="showSection('reservations')">Reservations</a></li>
+                <li id="link-serv"><a href="#" onclick="showSection('services-manage')">Manage Services</a></li>
+                <li><a href="index.html" class="logout-link">Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="admin-main">
+            
+            <section id="reservations-section">
+                <header class="admin-header">
+                    <h2>Upcoming Schedule</h2>
+                    <p>Sorted from earliest to latest</p>
+                </header>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Service</th>
+                                <th>Date & Time</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="services-section" style="display: none;">
+                <header class="admin-header">
+                    <h2>Manage Services</h2>
+                    <button class="add-btn" onclick="openServiceModal()">+ Add New Service</button>
+                </header>
+                <div class="services-admin-grid" id="adminServicesGrid">
+                    </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAdminModal()">&times;</span>
+            <h2 id="adminModalTitle">Edit Item</h2>
+            <form id="adminEditForm">
+                <div id="modalInputs"></div>
+                <button type="submit" class="submit-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>
