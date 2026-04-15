@@ -17,7 +17,7 @@ let currentRole = 'user';
 
 function setRole(role) {
     currentRole = role;
-    
+
     // Update UI buttons
     const userBtn = document.getElementById('userBtn');
     const adminBtn = document.getElementById('adminBtn');
@@ -34,7 +34,7 @@ function setRole(role) {
 // Handle Form Submission
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
-    loginForm.addEventListener('submit', function(e) {
+    loginForm.addEventListener('submit', function (e) {
         e.preventDefault(); // Prevent page refresh
 
         const email = document.getElementById('email').value;
@@ -53,11 +53,20 @@ if (loginForm) {
 
 
 
-// Modal Functions
+
+
+
+
+// --- NEW USER BOOKING LOGIC ---
+// We need this variable to remember which service was clicked 
+// because the form itself doesn't know.
+let selectedServiceForBooking = "";
+
 function openBooking(serviceName) {
+    selectedServiceForBooking = serviceName;
     const modal = document.getElementById('bookingModal');
     const title = document.getElementById('modalTitle');
-    
+
     if (modal) {
         title.innerText = `Book ${serviceName}`;
         modal.style.display = 'flex';
@@ -72,7 +81,7 @@ function closeBooking() {
 }
 
 // Close modal if user clicks outside the box
-window.onclick = function(event) {
+window.onclick = function (event) {
     const modal = document.getElementById('bookingModal');
     if (event.target == modal) {
         modal.style.display = 'none';
@@ -82,59 +91,99 @@ window.onclick = function(event) {
 // Handle Reservation Form
 const reservationForm = document.getElementById('reservationForm');
 if (reservationForm) {
-    reservationForm.addEventListener('submit', function(e) {
+    reservationForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
         const email = document.getElementById('userEmail').value;
         const date = document.getElementById('bookingDate').value;
         const time = document.getElementById('bookingTime').value;
 
-        alert(`Success! A confirmation email has been sent to ${email} for your appointment on ${date} at ${time}.`);
-        
+        // 1. Create a new reservation object
+        const newReservation = {
+            id: Date.now(), // Unique ID
+            email: email,
+            service: selectedServiceForBooking,
+            date: date,
+            time: time
+        };
+
+        // 2. Add to the global reservations array
+        reservations.push(newReservation);
+
+        // 3. SAVE to LocalStorage so the Admin Panel can read it
+        saveData();
+
+        alert(`Success! Your appointment for ${selectedServiceForBooking} is confirmed for ${date} at ${time}.`);
+
         closeBooking();
-        // Here is where you'd later refresh the calendar logic
+        reservationForm.reset(); // Clear the form for next time
     });
 }
+
+
+
+
+
 
 
 
 //Admin Dashboard Logic
-// --- MOCK DATA ---
-let reservations = [
-    { id: 1, email: 'nina@test.com', service: 'Hair Styling', date: '2024-06-20', time: '14:00' },
-    { id: 2, email: 'marco@test.com', service: 'Nail Art', date: '2024-06-15', time: '09:00' },
-    { id: 3, email: 'sara@test.com', service: 'Spa', date: '2024-06-15', time: '11:00' }
+// --- DATA MANAGEMENT (Local Storage) ---
+// This ensures that changes made by Admin persist and show up for the User.
+let services = JSON.parse(localStorage.getItem('services')) || [
+    { id: 1, name: 'Hair Styling', icon: '💇‍♀️', desc: 'Cuts, coloring, and treatments.' },
+    { id: 2, name: 'Nail Art', icon: '💅', desc: 'Manicures and pedicures.' },
+    { id: 3, name: 'Spa & Massage', icon: '🧖‍♀️', desc: 'Deep tissue relaxation.' }
 ];
 
-let services = [
-    { id: 1, name: 'Hair Styling', icon: '💇‍♀️', desc: 'Cuts and color.' },
-    { id: 2, name: 'Nail Art', icon: '💅', desc: 'Manicures.' },
-    { id: 3, name: 'Spa & Massage', icon: '🧖‍♀️', desc: 'Relaxation.' }
-];
+let reservations = JSON.parse(localStorage.getItem('reservations')) || [];
 
-// --- SECTION TOGGLE ---
+function saveData() {
+    localStorage.setItem('services', JSON.stringify(services));
+    localStorage.setItem('reservations', JSON.stringify(reservations));
+}
+
+// --- SHARED UI RENDERING ---
+
+// Run this on dashboard-user.html to show services the Admin added
+function renderUserServices() {
+    const grid = document.querySelector('.services-grid');
+    if (!grid) return;
+
+    grid.innerHTML = services.map(s => `
+        <div class="service-card">
+            <div class="service-icon">${s.icon}</div>
+            <h3>${s.name}</h3>
+            <p>${s.desc}</p>
+            <button onclick="openBooking('${s.name}')" class="book-btn">Book Now</button>
+        </div>
+    `).join('');
+}
+
+// --- ADMIN SIDEBAR & TOGGLE ---
 function showSection(section) {
-    document.getElementById('reservations-section').style.display = section === 'reservations' ? 'block' : 'none';
-    document.getElementById('services-section').style.display = section === 'services-manage' ? 'block' : 'none';
-    
+    const resSec = document.getElementById('reservations-section');
+    const servSec = document.getElementById('services-section');
+
+    if (!resSec || !servSec) return;
+
+    resSec.style.display = section === 'reservations' ? 'block' : 'none';
+    servSec.style.display = section === 'services-manage' ? 'block' : 'none';
+
     document.getElementById('link-res').classList.toggle('active', section === 'reservations');
     document.getElementById('link-serv').classList.toggle('active', section === 'services-manage');
 
-    if(section === 'reservations') renderReservations();
-    else renderServices();
+    if (section === 'reservations') renderAdminReservations();
+    else renderAdminServices();
 }
 
-// --- RESERVATION LOGIC (SORTING) ---
-function renderReservations() {
+// --- ADMIN: MANAGE RESERVATIONS ---
+function renderAdminReservations() {
     const tbody = document.getElementById('adminTableBody');
     if (!tbody) return;
 
-    // SORTING: Earliest date first, then earliest time
-    reservations.sort((a, b) => {
-        const dateTimeA = new Date(`${a.date}T${a.time}`);
-        const dateTimeB = new Date(`${b.date}T${b.time}`);
-        return dateTimeA - dateTimeB;
-    });
+    // Sort by Date and Time (Earliest First)
+    reservations.sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`));
 
     tbody.innerHTML = reservations.map(res => `
         <tr>
@@ -149,8 +198,8 @@ function renderReservations() {
     `).join('');
 }
 
-// --- SERVICE LOGIC ---
-function renderServices() {
+// --- ADMIN: MANAGE SERVICES ---
+function renderAdminServices() {
     const grid = document.getElementById('adminServicesGrid');
     if (!grid) return;
 
@@ -158,50 +207,79 @@ function renderServices() {
         <div class="admin-service-card">
             <h3>${s.icon} ${s.name}</h3>
             <p>${s.desc}</p>
-            <button class="edit-btn" onclick="editService(${s.id})">Edit</button>
-            <button class="delete-btn" onclick="deleteService(${s.id})">Delete</button>
+            <div style="margin-top:10px">
+                <button class="edit-btn" onclick="openServiceModal(${s.id})">Edit</button>
+                <button class="delete-btn" onclick="deleteService(${s.id})">Delete</button>
+            </div>
         </div>
     `).join('');
 }
 
-// --- EDITING LOGIC ---
-function editReservation(id) {
-    const res = reservations.find(r => r.id === id);
+// --- MODAL LOGIC (ADD/EDIT) ---
+function openServiceModal(id = null) {
     const modal = document.getElementById('adminModal');
     const inputArea = document.getElementById('modalInputs');
-    
-    document.getElementById('adminModalTitle').innerText = "Edit Reservation";
+    const title = document.getElementById('adminModalTitle');
+
+    const service = id ? services.find(s => s.id === id) : { name: '', icon: '✨', desc: '' };
+
+    title.innerText = id ? "Edit Service" : "Add New Service";
     inputArea.innerHTML = `
-        <input type="hidden" id="editId" value="${res.id}">
-        <label>Service</label>
-        <select id="editService" class="input-group">
-            ${services.map(s => `<option value="${s.name}" ${s.name === res.service ? 'selected' : ''}>${s.name}</option>`).join('')}
-        </select>
-        <label>Date</label>
-        <input type="date" id="editDate" value="${res.date}" class="input-group">
-        <label>Time</label>
-        <input type="time" id="editTime" value="${res.time}" class="input-group">
+        <input type="hidden" id="serviceId" value="${id || ''}">
+        <div class="input-group">
+            <label>Service Name</label>
+            <input type="text" id="sName" value="${service.name}" required>
+        </div>
+        <div class="input-group">
+            <label>Icon (Emoji)</label>
+            <input type="text" id="sIcon" value="${service.icon}" required>
+        </div>
+        <div class="input-group">
+            <label>Description</label>
+            <textarea id="sDesc" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">${service.desc}</textarea>
+        </div>
     `;
+
     modal.style.display = 'flex';
 
-    document.getElementById('adminEditForm').onsubmit = function(e) {
+    document.getElementById('adminForm').onsubmit = function (e) {
         e.preventDefault();
-        res.service = document.getElementById('editService').value;
-        res.date = document.getElementById('editDate').value;
-        res.time = document.getElementById('editTime').value;
+        const sId = document.getElementById('serviceId').value;
+        const newService = {
+            id: sId ? parseInt(sId) : Date.now(),
+            name: document.getElementById('sName').value,
+            icon: document.getElementById('sIcon').value,
+            desc: document.getElementById('sDesc').value
+        };
+
+        if (sId) {
+            const index = services.findIndex(s => s.id === parseInt(sId));
+            services[index] = newService;
+        } else {
+            services.push(newService);
+        }
+
+        saveData();
         closeAdminModal();
-        renderReservations();
+        renderAdminServices();
     };
 }
 
-function deleteReservation(id) {
-    reservations = reservations.filter(r => r.id !== id);
-    renderReservations();
+function deleteService(id) {
+    if (confirm("Delete this service? It will disappear for users too.")) {
+        services = services.filter(s => s.id !== id);
+        saveData();
+        renderAdminServices();
+    }
 }
 
+// --- HELPER FUNCTIONS ---
 function closeAdminModal() {
     document.getElementById('adminModal').style.display = 'none';
 }
 
-// Initialize
-window.onload = renderReservations;
+// Run correct render based on which page we are on
+window.onload = () => {
+    renderUserServices(); // Works on dashboard-user.html
+    renderAdminReservations(); // Works on dashboard-admin.html
+};
