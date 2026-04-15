@@ -1,15 +1,39 @@
+// --- LANDING PAGE LOGIC ---
 function handleBooking(serviceName) {
-    // For now, we simulate a check
-    const isLoggedIn = false; // This will later be handled by your login logic
+    const modal = document.getElementById('loginRequiredModal');
+    const message = document.getElementById('loginModalMessage');
 
-    if (!isLoggedIn) {
-        alert(`To book a ${serviceName} appointment, please login first!`);
-        window.location.href = "login.html";
-    } else {
-        // Redirect to user dashboard or booking form
-        window.location.href = "dashboard-user.html";
+    if (modal) {
+        // Customize the message with the service name
+        message.innerText = `To book a ${serviceName} appointment, please login to your account first.`;
+        modal.style.display = 'flex';
     }
 }
+
+function closeLoginModal() {
+    const modal = document.getElementById('loginRequiredModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Ensure the "click outside to close" works for this modal too
+window.onclick = function (event) {
+    const loginModal = document.getElementById('loginRequiredModal');
+    const bookingModal = document.getElementById('bookingModal'); // From user dash
+
+    if (event.target == loginModal) {
+        loginModal.style.display = 'none';
+    }
+    if (event.target == bookingModal) {
+        bookingModal.style.display = 'none';
+    }
+}
+
+
+
+
+
 
 
 // Variable to track the current role (default: user)

@@ -1,11 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Glow & Relax | Booking Services</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
+
+<div id="loginRequiredModal" class="modal">
+    <div class="modal-content" style="text-align: center;">
+        <span class="close" onclick="closeLoginModal()">&times;</span>
+        <h2 id="loginModalTitle">Login Required</h2>
+        <p id="loginModalMessage" style="margin: 20px 0;">To book an appointment, please login to your account first.
+        </p>
+        <button onclick="window.location.href='login.html'" class="submit-btn">Go to Login</button>
+    </div>
+</div>
+
 <body>
 
     <nav class="navbar">
@@ -23,7 +35,7 @@
 
     <section id="services" class="services-container">
         <h2 class="section-title">Our Services</h2>
-        
+
         <div class="services-grid">
             <div class="service-card">
                 <div class="service-icon">💇‍♀️</div>
@@ -50,4 +62,5 @@
 
     <script src="../js/main.js"></script>
 </body>
+
 </html>
